@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs
 
 
 # Определяем настройки для запуска
@@ -7,17 +8,25 @@ serverPort = 8080  # Порт для доступа по сети
 
 
 class MyServer(BaseHTTPRequestHandler):
+    @staticmethod
+    def __get_html_content():
+        with open('index_4.html', encoding='utf-8') as file:
+            return file.read()
     """
-        Специальный класс, который отвечает за
-        обработку входящих запросов от клиентов
+    Класс для обработки входящих запросов от клиентов
     """
+
+
 
     def do_GET(self):
         """ Метод для обработки входящих GET-запросов """
+        query_components = parse_qs(urlparse(self.path).query)
+        print(query_components)
+        page_content = self.__get_html_content()
         self.send_response(200)  # Отправка кода ответа
-        self.send_header("Content-type", "application/json")  # Отправка типа данных, который будет передаваться
+        self.send_header("Content-type", "text/html")  # Отправка типа данных, который будет передаваться
         self.end_headers()  # Завершение формирования заголовков ответа
-        self.wfile.write(bytes("{'message': 'Hello SkyPro Team'}", "utf-8"))  # Тело ответа
+        self.wfile.write(bytes(page_content, "utf-8"))  # Тело ответа
 
 
 if __name__ == "__main__":
